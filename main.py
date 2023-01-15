@@ -39,7 +39,7 @@ class Wall(pygame.sprite.Sprite):
 
 class Border(pygame.sprite.Sprite):
     def __init__(self, x1, y1, x2, y2):
-        super().__init__()
+        super().__init__(all_sprites)
         if x1 == x2:
             self.add(vertical_borders)
             self.image = pygame.Surface([1, y2 - y1])
@@ -50,7 +50,26 @@ class Border(pygame.sprite.Sprite):
             self.image = pygame.Surface([x2 - x1, 1])
             self.image.fill((255, 255, 255))
             self.rect = pygame.Rect(x1, y1, x2 - x1, 1)
-        self.add(all_sprites)
+
+
+class Main_Hero(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(all_sprites)
+        radius = 25
+        self.radius = 25
+        self.image = pygame.Surface((2 * radius, 2 * radius),
+                                    pygame.SRCALPHA, 32)
+        pygame.draw.circle(self.image, pygame.Color("red"),
+                           (radius, radius), radius)
+        self.rect = pygame.Rect(500, 500, 2 * radius, 2 * radius)
+
+    def move(self, delta_x, delta_y):
+        self.rect.x += delta_x
+        self.rect.y += delta_y
+        if pygame.sprite.spritecollideany(self, horizontal_borders) or \
+            pygame.sprite.spritecollideany(self, vertical_borders) or \
+            pygame.sprite.spritecollideany(self, battlefield):
+            pass
 
 
 all_sprites = pygame.sprite.Group()
@@ -79,7 +98,9 @@ vertical_borders = pygame.sprite.Group()
 
 Border(0, 200, 0, 600)
 Border(300, 0, 1000, 0)
-Border(1000, 0, 999, 800)
+Border(999, 0, 999, 800)
+
+hero = Main_Hero()
 
 running = True
 while running:
@@ -87,6 +108,11 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN:
+            if pygame.key.get_pressed()[pygame.K_RIGHT]:
+                hero.move(10, 0)
+            if pygame.key.get_pressed()[pygame.K_LEFT]:
+                hero.move(-10, 0)
     all_sprites.draw(screen)
     pygame.display.flip()
 pygame.quit()
