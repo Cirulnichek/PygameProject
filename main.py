@@ -43,33 +43,32 @@ class Border(pygame.sprite.Sprite):
         if x1 == x2:
             self.add(vertical_borders)
             self.image = pygame.Surface([1, y2 - y1])
-            self.image.fill((255, 255, 255))
             self.rect = pygame.Rect(x1, y1, 1, y2 - y1)
         else:
             self.add(horizontal_borders)
             self.image = pygame.Surface([x2 - x1, 1])
-            self.image.fill((255, 255, 255))
             self.rect = pygame.Rect(x1, y1, x2 - x1, 1)
 
 
 class Main_Hero(pygame.sprite.Sprite):
+    image = load_image('hero.png')
+
     def __init__(self):
         super().__init__(all_sprites)
-        radius = 25
-        self.radius = 25
-        self.image = pygame.Surface((2 * radius, 2 * radius),
-                                    pygame.SRCALPHA, 32)
-        pygame.draw.circle(self.image, pygame.Color("red"),
-                           (radius, radius), radius)
-        self.rect = pygame.Rect(500, 500, 2 * radius, 2 * radius)
+        self.image = Main_Hero.image
+        self.rect = self.image.get_rect()
+        self.rect.x = 500
+        self.rect.y = 500
+        self.add(hero)
 
-    def move(self, delta_x, delta_y):
+    def update(self, delta_x, delta_y):
         self.rect.x += delta_x
         self.rect.y += delta_y
         if pygame.sprite.spritecollideany(self, horizontal_borders) or \
-            pygame.sprite.spritecollideany(self, vertical_borders) or \
-            pygame.sprite.spritecollideany(self, battlefield):
-            pass
+                pygame.sprite.spritecollideany(self, vertical_borders) or \
+                pygame.sprite.spritecollideany(self, battlefield):
+            self.rect.x -= delta_x
+            self.rect.y -= delta_y
 
 
 all_sprites = pygame.sprite.Group()
@@ -100,19 +99,41 @@ Border(0, 200, 0, 600)
 Border(300, 0, 1000, 0)
 Border(999, 0, 999, 800)
 
-hero = Main_Hero()
+hero = pygame.sprite.Group()
+Main_Hero()
 
+left = right = up = down = False
+
+clock = pygame.time.Clock()
 running = True
 while running:
-    screen.fill((0, 0, 0))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if pygame.key.get_pressed()[pygame.K_RIGHT]:
-                hero.move(10, 0)
-            if pygame.key.get_pressed()[pygame.K_LEFT]:
-                hero.move(-10, 0)
+            if pygame.key.get_pressed()[pygame.K_d]:
+                right = True
+            if pygame.key.get_pressed()[pygame.K_a]:
+                left = True
+            if pygame.key.get_pressed()[pygame.K_w]:
+                up = True
+            if pygame.key.get_pressed()[pygame.K_s]:
+                down = True
+        if event.type == pygame.KEYUP:
+            if event.key in [pygame.K_d, pygame.K_a]:
+                left = right = False
+            if event.key in [pygame.K_w, pygame.K_s]:
+                up = down = False
+    if right:
+        hero.update(8, 0)
+    if left:
+        hero.update(-8, 0)
+    if up:
+        hero.update(0, -8)
+    if down:
+        hero.update(0, 8)
+    screen.fill((0, 0, 0))
     all_sprites.draw(screen)
+    clock.tick(60)
     pygame.display.flip()
 pygame.quit()
