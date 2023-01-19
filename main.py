@@ -1,6 +1,8 @@
 import os
 import sys
 
+import math
+
 import pygame
 
 pygame.init()
@@ -59,7 +61,6 @@ class Main_Hero(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = 500
         self.rect.y = 500
-        self.add(hero)
 
     def update(self, delta_x, delta_y):
         self.rect.x += delta_x
@@ -69,6 +70,29 @@ class Main_Hero(pygame.sprite.Sprite):
                 pygame.sprite.spritecollideany(self, battlefield):
             self.rect.x -= delta_x
             self.rect.y -= delta_y
+
+
+class Batrank(pygame.sprite.Sprite):
+    image = load_image('batrank.png', -1)
+
+    def __init__(self, x, y):
+        super().__init__(all_sprites)
+        self.image = Batrank.image
+        self.rect = self.image.get_rect()
+        self.rect.x = main_hero.rect.x
+        self.rect.y = main_hero.rect.y + 30
+        delta_x = x - main_hero.rect.x
+        delta_y = y - main_hero.rect.y
+        self.alpha = math.atan(delta_x / delta_y)
+        self.speed = 10
+
+    def update(self):
+        self.rect.x += self.speed * math.sin(self.alpha)
+        self.rect.y += self.speed * math.cos(self.alpha)
+        if pygame.sprite.spritecollideany(self, horizontal_borders) or \
+                pygame.sprite.spritecollideany(self, vertical_borders) or \
+                pygame.sprite.spritecollideany(self, battlefield):
+            self.kill()
 
 
 all_sprites = pygame.sprite.Group()
@@ -100,7 +124,10 @@ Border(300, 0, 1000, 0)
 Border(999, 0, 999, 800)
 
 hero = pygame.sprite.Group()
-Main_Hero()
+main_hero = Main_Hero()
+main_hero.add(hero)
+
+batranks = pygame.sprite.Group()
 
 left = right = up = down = False
 
@@ -124,6 +151,8 @@ while running:
                 left = right = False
             if event.key in [pygame.K_w, pygame.K_s]:
                 up = down = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            Batrank(*event.pos).add(batranks)
     if right:
         hero.update(8, 0)
     if left:
@@ -132,6 +161,7 @@ while running:
         hero.update(0, -8)
     if down:
         hero.update(0, 8)
+    batranks.update()
     screen.fill((0, 0, 0))
     all_sprites.draw(screen)
     clock.tick(60)
