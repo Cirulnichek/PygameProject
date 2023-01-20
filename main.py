@@ -71,7 +71,7 @@ class Main_Hero(pygame.sprite.Sprite):
                 pygame.sprite.spritecollideany(self, battlefield):
             self.rect.x -= delta_x
             self.rect.y -= delta_y
-
+# Я гей
 
 
 class Batrank(pygame.sprite.Sprite):
@@ -175,7 +175,7 @@ enemy = Enemy(800, 20)
 enemy.add(enemies)
 
 left = right = up = down = False
-
+# Я гей
 clock = pygame.time.Clock()
 running = True
 while running:
@@ -214,3 +214,4 @@ while running:
     clock.tick(60)
     pygame.display.flip()
 pygame.quit()
+# Я гей
