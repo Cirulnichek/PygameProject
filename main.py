@@ -70,7 +70,7 @@ class Main_Hero(pygame.sprite.Sprite):
                 pygame.sprite.spritecollideany(self, battlefield):
             self.rect.x -= delta_x
             self.rect.y -= delta_y
-
+# Я гей
 
 class Batrank(pygame.sprite.Sprite):
     image = load_image('batrank.png', -1)
@@ -81,14 +81,18 @@ class Batrank(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = main_hero.rect.x
         self.rect.y = main_hero.rect.y + 30
-        delta_x = x - main_hero.rect.x
-        delta_y = y - main_hero.rect.y
-        self.alpha = math.atan(delta_x / delta_y)
-        self.speed = 10
+        x1, y1, x2, y2 = self.rect.x, self.rect.y, x, y
+        self.k = (y1 - y2) / (x1 - x2)
+        self.b = (y1 - self.k * x1)
+        if x1 < x2:
+            self.change = 5
+        else:
+            self.change = -5
+
 
     def update(self):
-        self.rect.x += self.speed * math.sin(self.alpha)
-        self.rect.y += self.speed * math.cos(self.alpha)
+        self.rect.x += self.change
+        self.rect.y = self.rect.x * self.k + self.b
         if pygame.sprite.spritecollideany(self, horizontal_borders) or \
                 pygame.sprite.spritecollideany(self, vertical_borders) or \
                 pygame.sprite.spritecollideany(self, battlefield):
@@ -130,7 +134,7 @@ main_hero.add(hero)
 batranks = pygame.sprite.Group()
 
 left = right = up = down = False
-
+# Я гей
 clock = pygame.time.Clock()
 running = True
 while running:
@@ -167,3 +171,4 @@ while running:
     clock.tick(60)
     pygame.display.flip()
 pygame.quit()
+# Я гей
