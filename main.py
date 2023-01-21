@@ -61,7 +61,7 @@ class Main_Hero(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = 500
         self.rect.y = 500
-        self.health = 100
+        self.health = 200
 
     def update(self, delta_x, delta_y):
         self.rect.x += delta_x
@@ -115,7 +115,7 @@ class Batrank(pygame.sprite.Sprite):
 
 
 class Enemy(pygame.sprite.Sprite):
-    sheet_right = load_image('enemy.png')
+    sheet_right = load_image('enemy.png', -1)
     sheet_left = pygame.transform.flip(sheet_right, True, False)
     columns = 3
     rows = 2
@@ -124,7 +124,7 @@ class Enemy(pygame.sprite.Sprite):
         super().__init__(all_sprites)
         self.add(enemies)
         self.frames = []
-        self.cut_sheet(Enemy.sheet_left, Enemy.columns, Enemy.rows)
+        self.cut_sheet(Enemy.sheet_left, Enemy.columns, Enemy.rows, x, y)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         self.rect = self.rect.move(x, y)
@@ -139,9 +139,11 @@ class Enemy(pygame.sprite.Sprite):
             enemies.remove(self)
             all_sprites.remove(self)
 
-    def cut_sheet(self, sheet, columns, rows):
+    def cut_sheet(self, sheet, columns, rows, x, y):
         self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
                                 sheet.get_height() // rows)
+        self.rect = self.rect.move(x, y)
+        self.check_existing()
         for j in range(rows):
             for i in range(columns):
                 frame_location = (self.rect.w * i, self.rect.h * j)
@@ -150,12 +152,14 @@ class Enemy(pygame.sprite.Sprite):
 
     def update(self):
         self.count += 1
-        # if main_hero.rect.x - self.rect.x - self.rect.w >= 0:
-        #     self.frames = []
-        #     self.cut_sheet(Enemy.sheet_right, Enemy.columns, Enemy.rows)
-        # else:
-        #     self.frames = []
-        #     self.cut_sheet(Enemy.sheet_left, Enemy.columns, Enemy.rows)
+        x = self.rect.x
+        y = self.rect.y
+        if main_hero.rect.x - self.rect.x - self.rect.w >= 0:
+            self.frames = []
+            self.cut_sheet(Enemy.sheet_right, Enemy.columns, Enemy.rows, x, y)
+        else:
+            self.frames = []
+            self.cut_sheet(Enemy.sheet_left, Enemy.columns, Enemy.rows, x, y)
         if self.count == 6:
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
             self.image = self.frames[self.cur_frame]
@@ -186,6 +190,7 @@ class Enemy(pygame.sprite.Sprite):
         except ZeroDivisionError:
             pass
 
+
 all_sprites = pygame.sprite.Group()
 
 battlefield = pygame.sprite.Group()
@@ -203,7 +208,6 @@ Wall(9, 5, battlefield)
 Wall(2, 3, battlefield)
 Wall(3, 3, battlefield)
 Wall(4, 3, battlefield)
-Wall(5, 3, battlefield)
 Wall(8, 4, battlefield)
 Wall(9, 4, battlefield)
 
@@ -245,7 +249,7 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.pos != (main_hero.rect.x, main_hero.rect.y):
                 Batrank(*event.pos)
-        if randint(1, 60) == 1:
+        if randint(1, 30) == 1:
             Enemy(randint(1, 1000), randint(1, 700))
     if right:
         hero.update(8, 0)
