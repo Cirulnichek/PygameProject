@@ -1,6 +1,6 @@
 import os
 import sys
-
+# Я гей
 from random import randint
 
 import pygame
@@ -19,6 +19,7 @@ def load_image(name, colorkey=None):
     image = pygame.image.load(fullname)
     if colorkey is not None:
         image = image.convert()
+        # Я гей
         if colorkey == -1:
             colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey)
@@ -89,8 +90,11 @@ class Batrank(pygame.sprite.Sprite):
         self.add(batranks)
         self.do_kill = 0
         x1, y1, x2, y2 = self.rect.x, self.rect.y, x, y
-        self.k = (y1 - y2) / (x1 - x2)
-        self.b = (y1 - self.k * x1)
+        try:
+            self.k = (y1 - y2) / (x1 - x2)
+            self.b = (y1 - self.k * x1)
+        except ZeroDivisionError:
+            pass
         if x1 < x2:
             self.change = 5
         else:
@@ -119,6 +123,7 @@ class Enemy(pygame.sprite.Sprite):
 
     def __init__(self, x, y):
         super().__init__(all_sprites)
+        self.add(enemies)
         self.frames = []
         self.cut_sheet(Enemy.sheet_left, Enemy.columns, Enemy.rows)
         self.cur_frame = 0
@@ -127,7 +132,7 @@ class Enemy(pygame.sprite.Sprite):
         self.count = 0
         self.health = 3
         self.check_existing()
-
+# Я гей
     def check_existing(self):
         if pygame.sprite.spritecollideany(self, horizontal_borders) or \
                 pygame.sprite.spritecollideany(self, vertical_borders) or \
@@ -148,6 +153,7 @@ class Enemy(pygame.sprite.Sprite):
         self.count += 1
         # if main_hero.rect.x - self.rect.x - self.rect.w >= 0:
         #     self.frames = []
+        #     Я гей
         #     self.cut_sheet(Enemy.sheet_right, Enemy.columns, Enemy.rows)
         # else:
         #     self.frames = []
@@ -181,7 +187,7 @@ class Enemy(pygame.sprite.Sprite):
                 self.rect.y = self.rect.x * k + b
         except ZeroDivisionError:
             pass
-
+# Я гей
 
 all_sprites = pygame.sprite.Group()
 
@@ -216,7 +222,7 @@ main_hero = Main_Hero()
 main_hero.add(hero)
 
 batranks = pygame.sprite.Group()
-
+# Я гей
 enemies = pygame.sprite.Group()
 
 left = right = up = down = False
@@ -244,8 +250,7 @@ while running:
             if event.pos != (main_hero.rect.x, main_hero.rect.y):
                 Batrank(*event.pos)
         if randint(1, 60) == 1:
-            enemy = Enemy(randint(1, 1000), randint(1, 700))
-            enemy.add(enemies)
+            Enemy(randint(1, 1000), randint(1, 700))
     if right:
         hero.update(8, 0)
     if left:
